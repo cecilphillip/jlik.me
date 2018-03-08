@@ -102,6 +102,9 @@ namespace jlikme
                 return req.CreateResponse(HttpStatusCode.NotFound);
             }
 
+            if (keyTable == null) {
+                keyTable = new NextId() { Id = 0, PartitionKey="1", RowKey = Utility.KEY };
+            }
             try
             {
                 var result = new List<ShortResponse>();
@@ -130,7 +133,7 @@ namespace jlikme
                 // strategy to save the key 
                 async Task saveKeyAsync()
                 {
-                    var operation = TableOperation.Replace(keyTable);
+                    var operation = (keyTable.Id == 1 && keyTable.ETag == null) ? TableOperation.Insert(keyTable) : TableOperation.Replace(keyTable);
                     await tableOut.ExecuteAsync(operation);
                 }
 
